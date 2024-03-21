@@ -3,3 +3,20 @@
 
 
 Non linear genetic dependence using LD score regression and high school trigonometry
+
+
+### Installation
+
+Until we go public controbuteors can make a github auth token:
+
+https://github.com/settings/tokens
+
+And then install from github:
+
+```r
+devtools::install_github("MichelNivard/trigenometry",
+                         ref = "main",
+                         auth_token = # YOUR TOKEN HERE, DO NOT EVER SHARE TOKEN                      
+                        )
+
+```
