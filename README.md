@@ -1,3 +1,4 @@
 # trigenometry
 Non linear genetic dependence using LD score regresison high school trigonometry
-https://www.klipartz.com/en/sticker-png-rszmo![image](https://github.com/MichelNivard/trigenometry/assets/11858442/954996c3-3e77-436d-ab69-0c5f1209b343)
+
+https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.flerlagetwins.com%2F2017%2F11%2Fbeyond-me-part-2-trigonometry_1.html&psig=AOvVaw31SLlx_1hSl6udxd2XKlme&ust=1711116439502000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCICqhc7DhYUDFQAAAAAdAAAAABAE![image](https://github.com/MichelNivard/trigenometry/assets/11858442/9e13d97b-43af-40e1-9589-17eda7fdcc80)
