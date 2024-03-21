@@ -7,7 +7,7 @@ Non linear genetic dependence using LD score regression and high school trigonom
 
 ### Installation
 
-Until we go public controbuteors can make a github auth token:
+Until we go public contributors can make a github auth token:
 
 https://github.com/settings/tokens
 
