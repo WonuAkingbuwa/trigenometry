@@ -30,16 +30,10 @@ cor2curve(
 \value{
 plot of the interpolated curves (optional)
 
-plot of resampled verison of  interpolated curves to indicate statistical uncertainty (optional)
+plot of re-sampled version of  interpolated curves to indicate statistical uncertainty (optional)
 
-a list with parameters, optimizer statses and the method used for interpolation
+a list with any data pruning undertaken, parameters, optimizer status and the method used for interpolation
 }
 \description{
-Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, infer the shap of their relation
-
-Prior to using thes function x was binned into segments of the distribution of x (say deciles), and each unqiuque pair of bins of x are used as cases and controls respectively in a GWAS.
-
-Based on these GWASs of segments of x, and a GWAS of y, genetic correlations are computed, either in LDScore regression, or `ldsc()` in GenomicSEM, which implements LD score regression in r.
-
-The genetic correlations, and informatino of which segments of x fed into the GWAS, a curve is interplotatedf using either a 5th order polynomial, or cubic-spline interpolation where a 32th order polynomial is fit to 3 segments of the total distribution of x. 
+Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and apira of bins are used as case.control in a GWAS
 }

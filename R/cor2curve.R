@@ -8,12 +8,9 @@
 #' @param method either "polynomial' or "cubic-spline" specifies the method used for interpolation
 #'
 #' @return plot of the interpolated curves (optional)
-#' @return plot of resampled verison of  interpolated curves to indicate statistical uncertainty (optional)
-#' @return a list with parameters, optimizer statses and the method used for interpolation
+#' @return plot of re-sampled version of  interpolated curves to indicate statistical uncertainty (optional)
+#' @return a list with any data pruning undertaken, parameters, optimizer status and the method used for interpolation
 cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRUE,boot=FALSE,x.trait="",y.trait=""){
-
-
-
   # Arguments:
   # rg: genetic correlation genetic correlation between this GWAS of a pair of bins of x, and the outcome y.
   # b1:value assigned to bin b1 used in the GWAS of "x" usually a count, or median/mean phenotype for participants in the bin, used to compute dx
@@ -39,14 +36,19 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
   b2 <- dat2[,3]
   se <- dat2[,4]
 
+  mess <- "No missing data"
   if( nrow(dat2) < nrow(dat)){
     print(paste0("Had to omit ",nrow(dat) - nrow(dat2)," rows with missing values in rg, b1, b2, or se" ))
+    mess <- paste0("Had to omit ",nrow(dat) - nrow(dat2)," rows with missing values in rg, b1, b2, or se" )
+
   }
 
 
   # warn if rg our of bounds
+  mess2 <- "All genetic correlations between -1 and 1"
   if(sum(abs(rg)  > 1) > 0){
     print(paste0("Had to omit ",sum(abs(rg)  > 1)," rows with rg our of bounds (-1 to 1)" ))
+    mess2 <- paste0("Had to omit ",sum(abs(rg)  > 1)," rows with rg our of bounds (-1 to 1)" )
   }
   # remove out of bounds
   b1 <- b1[abs(rg) <= 1]
@@ -92,27 +94,26 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
       min <- min(c(b1,b2))
       max <- max(c(b1,b2))
 
-
       beta <- unique(b1)
 
       ys <- fit$par[1]*beta ^5 + fit$par[2]*beta ^4 + fit$par[3]*beta ^3 + fit$par[4]*beta ^2 + fit$par[5]*beta
 
+      # build an intercept
       int <- mean(ys)
 
+      # automatically pick sensible y limits
+      ylim <-  c(min(ys) - int,max(ys) - int)
 
-      ylim <- c(fit$par[1]*min^5 + fit$par[2]*min^4 + fit$par[3]*min^3 + fit$par[4]*min^2 + fit$par[5]*min -int,
-                fit$par[1]*max^5 + fit$par[2]*max^4 + fit$par[3]*max^3 + fit$par[4]*max^2 + fit$par[5]*max - int)
-
+      # Margins aroudn the y-limits
       ylim[1] <- (ylim[1] - .2*(abs(ylim[1] - ylim[2])))
       ylim[2] <- (ylim[2] + .2*(abs(ylim[1] - ylim[2])))
 
       curve(fit$par[1]*x^5 + fit$par[2]*x^4 + fit$par[3]*x^3 + fit$par[4]*x^2 + fit$par[5]*x  - int,from = min, to = max,ylim=ylim,ylab=y.trait,xlab=x.trait)
 
-
     }
 
 
-
+    sep <- rep(NA,5)
 
     if(boot==T){
 
@@ -171,10 +172,11 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
 
     if(plot==T){
       curve(fit$par[1]*x^5 + fit$par[2]*x^4 + fit$par[3]*x^3 + fit$par[4]*x^2 + fit$par[5]*x - int,from = min, to = max,ylim=ylim,col="red",lwd=2,add=T)
-
+      abline(v=beta,lty="dashed",col="lightblue",lwd=.5)
     }
 
     out <-  list(method=method,
+                 messages = c(mess,mess2),
                  observations=length(rg),
                  coefficients = cbind.data.frame(term = c("5th","4th","3th","2nd","1st"),
                                                  parameter = fit$par,
@@ -263,8 +265,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
 
 
 
-      ylim <- c(fit$par[1]*min^3 + fit$par[2] * min^2 + fit$par[3] * min + fit$par[4] - int,
-                fit$par[9]*max^3 + fit$par[10] * max^2 + fit$par[11] * max + fit$par[12] - int)
+      ylim <- c(min(ys) - int,max(ys) - int)
 
       ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
       ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
@@ -279,6 +280,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
 
     }
 
+    sep <- rep(NA,12)
 
     if(boot==T){
 
@@ -334,12 +336,13 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
       curve(fit$par[5]*x^3 + fit$par[6] * x^2 + fit$par[7] * x + fit$par[8]  - int,from = q1,to=q2,add=T,col="red",lwd=2)
 
       curve(fit$par[9]*x^3 + fit$par[10] * x^2 + fit$par[11] * x + fit$par[12] - int,from = q2,to=max,add=T,col="red",lwd=2)
-
+      abline(v=beta,lty="dashed",col="lightblue",lwd=.5)
     }
 
 
 
     out <-  list(method=method,
+                 messages = c(mess,mess2),
                  observations=length(rg),
                  cubic1 = cbind.data.frame(term = c("3th","2nd","1st","int"),
                                            parameters = fit$par[1:4],

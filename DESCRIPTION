@@ -1,10 +1,10 @@
 Package: TriGenometry
 Type: Package
 Title: Interpolate the (non)linear shape of a relation between two traits based on genetic correlations
-Version: 0.1.0
-Author: Wonu Akingbuwa & Michel Nivard
-Maintainer: 
-Description: Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned into segments of the distributions of x, and a pair of bins are used as case/control in a GWAS
+Version: 0.0.1
+Author: Wonu Akingbuwa, Michel Nivard
+Maintainer: Michel Nivard <m.g.nivard@bristol.ac.uk>
+Description: Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and apira of bins are used as case.control in a GWAS
 License: GPL=3.0
 Encoding: UTF-8
 LazyData: true
