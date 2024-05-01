@@ -29,8 +29,6 @@ cor2curve(
 \item{q1}{value (in terms of the scale of b1/b2) at which to place the second of two knows for the method 'cubic-spline', ignored if method is 'polynomial', automatically initiated in left at the default value NULL}
 
 \item{boot}{logical used to indicate whether the genetic correlations should be re-sampled 200 times (based on point estimate and s.e.) to estimate parameter uncertainty (standard errors) and introduce curves to a plot to visualize uncertainty  (optional)}
-
-\item{plot}{logical used to specify whether function should output a plot of the interpolated curves (optional)}
 }
 \value{
 a list with any data pruning undertaken, parameters, optimizer status and the method used for interpolation
@@ -38,5 +36,5 @@ a list with any data pruning undertaken, parameters, optimizer status and the me
 (optionally) a curve reflection the estimated non-linear genetic relationship.
 }
 \description{
-Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and apira of bins are used as case.control in a GWAS
+Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and a pair of bins are used as case.control in a GWAS
 }

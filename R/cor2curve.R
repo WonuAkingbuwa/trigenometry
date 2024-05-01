@@ -1,6 +1,6 @@
 #' Interpolate the (non)linear shape of a relation between two traits based on genetic correlations
 #'
-#' Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and apira of bins are used as case.control in a GWAS
+#' Based on genetic correlations between trait y (can be binary or continuous trait) and a number of GWASs of trait x, where x is binned  into segments of the distributions of x, and a pair of bins are used as case.control in a GWAS
 #'
 #' @param rg genetic correlation genetic correlation between outcome y and a pair of bins of x
 #' @param b1 value assigned to bin b1 used in the GWAS of "x" usually a count, or median/mean phenotype for participants in the bin, used to compute dx
@@ -9,7 +9,6 @@
 #'
 #' @param q1 value (in terms of the scale of b1/b2) at which to place the first of two knows for the method 'cubic-spline', ignored if method is 'polynomial', automatically initiated in left at the default value NULL
 #' @param q1 value (in terms of the scale of b1/b2) at which to place the second of two knows for the method 'cubic-spline', ignored if method is 'polynomial', automatically initiated in left at the default value NULL
-#' @param plot logical used to specify whether function should output a plot of the interpolated curves (optional)
 #' @param boot logical used to indicate whether the genetic correlations should be re-sampled 200 times (based on point estimate and s.e.) to estimate parameter uncertainty (standard errors) and introduce curves to a plot to visualize uncertainty  (optional)
 #'
 #'
