@@ -7,10 +7,15 @@
 #' @param b2 value assigned to bin b2 used in the GWAS of "x" , usually a count, or median/mean phenotype for participants in the bin, used to compute dx
 #' @param method either "polynomial' or "cubic-spline" specifies the method used for interpolation
 #'
-#' @return plot of the interpolated curves (optional)
-#' @return plot of re-sampled version of  interpolated curves to indicate statistical uncertainty (optional)
+#' @param q1 value (in terms of the scale of b1/b2) at which to place the first of two knows for the method 'cubic-spline', ignored if method is 'polynomial', automatically initiated in left at the default value NULL
+#' @param q1 value (in terms of the scale of b1/b2) at which to place the second of two knows for the method 'cubic-spline', ignored if method is 'polynomial', automatically initiated in left at the default value NULL
+#' @param plot logical used to specify whether function should output a plot of the interpolated curves (optional)
+#' @param boot logical used to indicate whether the genetic correlations should be re-sampled 200 times (based on point estimate and s.e.) to estimate parameter uncertainty (standard errors) and introduce curves to a plot to visualize uncertainty  (optional)
+#'
+#'
 #' @return a list with any data pruning undertaken, parameters, optimizer status and the method used for interpolation
-cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRUE,boot=FALSE,x.trait="",y.trait=""){
+#' @return (optionally) a curve reflection the estimated non-linear genetic relationship.
+cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FALSE,x.trait="",y.trait=""){
   # Arguments:
   # rg: genetic correlation genetic correlation between this GWAS of a pair of bins of x, and the outcome y.
   # b1:value assigned to bin b1 used in the GWAS of "x" usually a count, or median/mean phenotype for participants in the bin, used to compute dx
@@ -21,7 +26,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
   # plot, do we want a plot of the curve?
 
   # boot, do you need bootstrapped alternate curves?
-
+  sev <- NULL
 
   # dy (test argument!)
   dx <- abs(b1 - b2)
@@ -90,29 +95,6 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
     out <- fit # update
 
 
-    if(plot==TRUE){
-      min <- min(c(b1,b2))
-      max <- max(c(b1,b2))
-
-      beta <- unique(b1)
-
-      ys <- fit$par[1]*beta ^5 + fit$par[2]*beta ^4 + fit$par[3]*beta ^3 + fit$par[4]*beta ^2 + fit$par[5]*beta
-
-      # build an intercept
-      int <- mean(ys)
-
-      # automatically pick sensible y limits
-      ylim <-  c(min(ys) - int,max(ys) - int)
-
-      # Margins aroudn the y-limits
-      ylim[1] <- (ylim[1] - .2*(abs(ylim[1] - ylim[2])))
-      ylim[2] <- (ylim[2] + .2*(abs(ylim[1] - ylim[2])))
-
-      curve(fit$par[1]*x^5 + fit$par[2]*x^4 + fit$par[3]*x^3 + fit$par[4]*x^2 + fit$par[5]*x  - int,from = min, to = max,ylim=ylim,ylab=y.trait,xlab=x.trait)
-
-    }
-
-
     sep <- rep(NA,5)
 
     if(boot==T){
@@ -154,15 +136,6 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
           sefit <- optim(par = c(0,0,0,0,0),fn = solve_fn,method = "BFGS")
         }
         sev[i,] <- sefit$par
-        if(plot==TRUE){
-
-          seys <- sefit$par[1]*beta^5 + sefit$par[2]*beta^4 + sefit$par[3]*beta^3 + sefit$par[4]*beta^2 + sefit$par[5]*beta
-
-          seint <- mean(seys)
-
-          curve(sefit$par[1]*x^5 + sefit$par[2]*x^4 + sefit$par[3]*x^3 + sefit$par[4]*x^2 + sefit$par[5]*x - seint,add=T,col="grey",lty="dashed")
-
-        }
 
       }
 
@@ -170,20 +143,26 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
 
     }
 
-    if(plot==T){
-      curve(fit$par[1]*x^5 + fit$par[2]*x^4 + fit$par[3]*x^3 + fit$par[4]*x^2 + fit$par[5]*x - int,from = min, to = max,ylim=ylim,col="red",lwd=2,add=T)
-      abline(v=beta,lty="dashed",col="lightblue",lwd=.5)
-    }
+
 
     out <-  list(method=method,
                  messages = c(mess,mess2),
                  observations=length(rg),
-                 coefficients = cbind.data.frame(term = c("5th","4th","3rd","2nd","1st"),
+                 coefficients = cbind.data.frame(term = c("5th","4th","3th","2nd","1st"),
                                                  parameter = fit$par,
                                                  se = sep,
                                                  z = fit$par/sep),
                  convergence= fit$convergence,
-                 value =fit$value)
+                 value =fit$value,
+                 boot=boot,
+                 b1 = b1,
+                 b2 = b2,
+                 par=fit$par,
+                 bpar=sev,
+                 x.trait=x.trait,
+                 y.trait=y.trait)
+
+    class(out) <- c("list", "cor2curve")
     return(out)
   }
 
@@ -250,43 +229,15 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
     fit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS")
 
 
-    if(plot==TRUE){
-      min <- min(c(b1,b2))
-      max <- max(c(b1,b2))
 
-
-
-      beta <- unique(b1)
-
-      ys <- ifelse(beta < q1,fit$par[1]*beta^3 + fit$par[2] * beta^2 + fit$par[3] * beta + fit$par[4],
-                   ifelse(beta >= q2,fit$par[9]*beta^3 + fit$par[10] * beta^2 + fit$par[11] * beta + fit$par[12],fit$par[5]*beta^3 + fit$par[6] * beta^2 + fit$par[7] * beta + fit$par[8]))
-
-      int <- mean(ys)
-
-
-
-      ylim <- c(min(ys) - int,max(ys) - int)
-
-      ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
-      ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
-
-
-      plot(NULL,ylim=ylim,xlim=c(min,max),ylab=y.trait,xlab=x.trait)
-      curve(fit$par[1]*x^3 + fit$par[2] * x^2 + fit$par[3] * x + fit$par[4]  - int ,from =min,to=q1,add=T)
-
-      curve(fit$par[5]*x^3 + fit$par[6] * x^2 + fit$par[7] * x + fit$par[8] - int ,from = q1,to=q2,add=T)
-
-      curve(fit$par[9]*x^3 + fit$par[10] * x^2 + fit$par[11] * x + fit$par[12] - int ,from = q2,to=max,add=T)
-
-    }
 
     sep <- rep(NA,12)
 
     if(boot==T){
 
-      sev <- matrix(NA,100,12)
+      sev <- matrix(NA,200,12)
 
-      for(i in 1:100){
+      for(i in 1:200){
 
         rgi <- rnorm(length(rg),rg,se)
 
@@ -305,21 +256,6 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
         sev[i,] <- sefit$par
 
 
-        if(plot==TRUE){
-
-          seys <- ifelse(beta < q1,sefit$par[1]*beta^3 + sefit$par[2] * beta^2 + sefit$par[3] * beta + sefit$par[4],
-                         ifelse(beta >= q2,sefit$par[9]*beta^3 + sefit$par[10] * beta^2 + sefit$par[11] * beta + sefit$par[12],sefit$par[5]*beta^3 + sefit$par[6] * beta^2 + sefit$par[7] * beta + sefit$par[8]))
-
-          seint <- mean(seys)
-
-
-          curve(sefit$par[1]*x^3 + sefit$par[2] * x^2 + sefit$par[3] * x + sefit$par[4]  - seint,from =min,to=q1,add=T,col="grey",lty="dashed")
-
-          curve(sefit$par[5]*x^3 + sefit$par[6] * x^2 + sefit$par[7] * x + sefit$par[8] - seint,from = q1,to=q2,add=T,col="grey",lty="dashed")
-
-          curve(sefit$par[9]*x^3 + sefit$par[10] * x^2 + sefit$par[11] * x  + sefit$par[12] - seint,from = q2,to=max,add=T,col="grey",lty="dashed")
-
-        }
       }
 
 
@@ -329,41 +265,235 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,plot=TRU
     }
 
 
-    if(plot==TRUE){
-
-      curve(fit$par[1]*x^3 + fit$par[2] * x^2 + fit$par[3] * x + fit$par[4] - int,from =min,to=q1,add=T,col="red",lwd=2)
-
-      curve(fit$par[5]*x^3 + fit$par[6] * x^2 + fit$par[7] * x + fit$par[8]  - int,from = q1,to=q2,add=T,col="red",lwd=2)
-
-      curve(fit$par[9]*x^3 + fit$par[10] * x^2 + fit$par[11] * x + fit$par[12] - int,from = q2,to=max,add=T,col="red",lwd=2)
-      abline(v=beta,lty="dashed",col="lightblue",lwd=.5)
-    }
 
 
 
     out <-  list(method=method,
                  messages = c(mess,mess2),
                  observations=length(rg),
-                 cubic1 = cbind.data.frame(term = c("3rd","2nd","1st","int"),
+                 cubic1 = cbind.data.frame(term = c("3th","2nd","1st","int"),
                                            parameters = fit$par[1:4],
                                            se = sep[1:4]),
-                 cubic2 = cbind.data.frame(term = c("3rd","2nd","1st","int"),
+                 cubic2 = cbind.data.frame(term = c("3th","2nd","1st","int"),
                                            parameters = fit$par[5:8],
                                            se = sep[5:8]),
-                 cubic3 = cbind.data.frame(term = c("3rd","2nd","1st","int"),
+                 cubic3 = cbind.data.frame(term = c("3th","2nd","1st","int"),
                                            parameters = fit$par[9:12],
                                            se = sep[9:12]),
 
                  cuts = c(q1,q2),
                  convergence= fit$convergence,
+                 boot=boot,
                  value =fit$value,
-                 int=int)
+                 int=int,
+                 par=fit$par,
+                 b1=b1,
+                 b2=b2,
+                 boot=boot,
+                 x.trait=x.trait,
+                 y.trait=y.trait,
+                 bpar=sev)
 
-
+    class(out) <- c("list", "cor2curve")
     return(out)
+
+  }
+}
+
+
+
+#' Plot a curve based on cor2curve
+#'
+#' This function plot a curve based on the input parameters.
+#'
+#' @param x an object of class 'cor2curve' generated with the cor2curve() function.
+#' @param xlim numeric vector, optional. The x-axis limits for the plot, defaults to sensible values.
+#' @param ylim numeric vector, optional. The y-axis limits for the plot, defaults to sensible values.
+#' @param main character string, optional. The main title for the plot.
+#' @param sub character string, optional. The subtitle for the plot.
+#' @param xlab character string, optional. The x-axis label for the plot, as a default its inherited from cor2curve object.
+#' @param ylab character string, optional. The y-axis label for the plot, as a default its inherited from cor2curve object.
+#' @param boot logical, optional. Whether to include bootstrapped lines in the plot, as a default its inherited from cor2curve object.
+#'
+#' @return A plot of the curve.
+#'
+plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,ylab=NULL,boot=NULL){
+
+  if(is.null(xlab)){xlab <- x$x.trait}
+  if(is.null(ylab)){ylab <- x$y.trait}
+  if(is.null(boot)){boot <- x$boot}
+
+
+  if(x$method=="polynomial"){
+
+    par <-x$par
+    bpar <- x$bpar
+    min <- min(c(x$b1,x$b2))
+    max <- max(c(x$b1,x$b2))
+
+    if(is.null(xlim)){ xlim <- c(min,max)}
+
+    beta <- unique(x$b1)
+    # "draw rthe values on y given x:
+    ys <- par[1]*beta^5 + par[2]*beta^4 + par[3]*beta^3 + par[4]*beta^2 + par[5]*beta
+    # build an intercept
+    int <- mean(ys)
+
+    # pick smart ylims...
+    if(is.null(ylim)){
+      ylim <- c(min(ys) - int,max(ys) - int)
+
+      ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
+      ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
+    }
+
+    plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab)
+
+    #if bootstrapped lines are to be drawn:
+    if(x$boot){
+      for(i in 1:nrow(bpar)){
+        ys <- bpar[i,1]*beta ^5 + bpar[i,2]*beta ^4 + bpar[i,3]*beta ^3 + bpar[i,4]*beta ^2 + bpar[i,5]*beta
+
+        # build an intercept
+        int <- mean(ys)
+
+        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col="grey",lty="dashed")
+        abline(v=beta,lty="dashed",col="lightblue",lwd=.5)
+      }
+    }
+
+    # reset ys and int for main plot:
+    ys <- par[1]*beta^5 + par[2]*beta^4 + par[3]*beta^3 + par[4]*beta^2 + par[5]*beta
+
+    # build an intercept
+    int <- mean(ys)
+
+    curve(par[1]*x^5 + par[2]*x^4 + par[3]*x^3 + par[4]*x^2 + par[5]*x  - int,from = xlim[1], to = xlim[2],add=T)
+
 
   }
 
 
 
+  if(x$method =="cubic-spline"){
+
+    bpar <- x$bpar
+    par <- x$par
+    q1 <- x$cuts[1]
+    q2 <- x$cuts[2]
+
+    min <- min(c(x$b1,x$b2))
+    max <- max(c(x$b1,x$b2))
+
+    if(is.null(xlim)){ xlim <- c(min,max)}
+
+    beta <- unique(x$b1)
+
+    ys <- ifelse(beta < q1,x$par[1]*beta^3 + x$par[2] * beta^2 + x$par[3] * beta + x$par[4],
+                 ifelse(beta >= q2,x$par[9]*beta^3 + x$par[10] * beta^2 + x$par[11] * beta + x$par[12],x$par[5]*beta^3 + x$par[6] * beta^2 + x$par[7] * beta + x$par[8]))
+
+    int <- mean(ys)
+
+
+    if(is.null(ylim)){
+      ylim <- c(min(ys) - int,max(ys) - int)
+
+      ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
+      ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
+    }
+
+
+    plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab)
+
+    print(nrow(bpar))
+    ### Draw bootstrapped lines
+    if(x$boot){
+      for(i in 1:nrow(bpar)){
+        seys <- ifelse(beta < q1,bpar[i,1]*beta^3 + bpar[i,2] * beta^2 + bpar[i,3] * beta + bpar[i,4],
+                       ifelse(beta >= q2,bpar[i,9]*beta^3 + bpar[i,10] * beta^2 + bpar[i,11] * beta + bpar[i,12],x$bpar[i,5]*beta^3 + bpar[i,6] * beta^2 + bpar[i,7] * beta + bpar[i,8]))
+
+        seint <- mean(seys)
+
+
+        curve(bpar[i,1]*x^3 + bpar[i,2] * x^2 + bpar[i,3] * x + bpar[i,4]  - seint,from =min,to=q1,add=T,col="grey",lty="dashed")
+
+        curve(bpar[i,5]*x^3 + bpar[i,6] * x^2 + bpar[i,7] * x + bpar[i,8] - seint,from = q1,to=q2,add=T,col="grey",lty="dashed")
+
+        curve(bpar[i,9]*x^3 + bpar[i,10] * x^2 + bpar[i,11] * x  + bpar[i,12] - seint,from = q2,to=max,add=T,col="grey",lty="dashed")
+
+      }
+    }
+
+    # Plot the curve...
+
+    curve(par[1]*x^3 + par[2] * x^2 + par[3] * x + par[4]  - int ,from =min,to=q1,add=T)
+
+    curve(par[5]*x^3 + par[6] * x^2 + par[7] * x + par[8] - int ,from = q1,to=q2,add=T)
+
+    curve(par[9]*x^3 + par[10] * x^2 + par[11] * x + par[12] - int ,from = q2,to=max,add=T)
+
+  }
+
+
 }
+
+
+#' Print a cor2curve object
+#'
+#' @param x A cor2curve object
+#' @param ... Additional arguments (not used)
+#' @param quote A logical indicating whether to quote the output (default: FALSE)
+#'
+#' @description
+#' This function prints a summary of a cor2curve object, which is a custom object
+#' containing the results of a cor2curve analysis. The output includes the method
+#' used, messages, number of observations, coefficients or cubic spline parameters,
+#' cuts, convergence information, value, and intercept.
+#'
+#' @details
+#' The function prints different sets of information depending on the method used
+#' to fit the cor2curve. If the method is "polynomial", it prints the coefficients
+#' of the polynomial. If the method is "cubic-spline", it prints the parameters
+#' of the cubic spline.
+#'
+#' @return
+#' A list containing the summary information
+#' @examples
+#' # Create a cor2curve object (not shown)
+#' print.cor2curve(x)
+print.cor2curve = function(x){
+
+  if(x$method == "polynomial"){
+
+    print(list(method=x$method,
+               messages = x$message,
+               observations=x$observaions,
+               coefficients = x$coefficients,
+               cuts = x$cuts,
+               convergence= x$convergence,
+               value =x$value,
+               int=x$int))
+  }
+
+  if(x$method == "cubic-spline"){
+
+    print(list(method=x$method,
+               messages = x$message,
+               observations=x$observaions,
+               cubic1 = x$cubic1,
+               cubic2 = x$cubic2,
+               cubic3 = x$cubic3,
+               cuts = x$cuts,
+               convergence= x$convergence,
+               value =x$value,
+               int=x$int))
+  }
+
+}
+
+
+
+
+
+
+
