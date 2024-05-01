@@ -20,3 +20,19 @@ devtools::install_github("MichelNivard/trigenometry",
                         )
 
 ```
+
+
+### Usage
+
+Currently we split out makign a curve form ploting it:
+
+```r
+c2c <- cor2curve(...)
+
+plot(c2c)
+
+```
+
+This currently allows the user to set some axis labels, It will ease future updates for manually setting colors and perhaps ease combinin plots?
+
+
