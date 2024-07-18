@@ -327,8 +327,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
 
     par <-x$par
     bpar <- x$bpar
-    min <- min(c(x$b1,x$b2))
-    max <- max(c(x$b1,x$b2))
+    min <- min(c(x$b1,x$b2)) - 1
+    max <- max(c(x$b1,x$b2)) + 1
 
     if(is.null(xlim)){ xlim <- c(min,max)}
 
@@ -381,8 +381,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     q1 <- x$cuts[1]
     q2 <- x$cuts[2]
 
-    min <- min(c(x$b1,x$b2))
-    max <- max(c(x$b1,x$b2))
+    min <- min(c(x$b1,x$b2)) - 1
+    max <- max(c(x$b1,x$b2)) + 1
 
     if(is.null(xlim)){ xlim <- c(min,max)}
 
