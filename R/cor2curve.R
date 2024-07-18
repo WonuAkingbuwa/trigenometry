@@ -316,7 +316,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 #'
 #' @return A plot of the curve.
 #'
-plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,ylab=NULL,boot=NULL){
+plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,ylab=NULL,boot=NULL,add=FALSE){
 
   if(is.null(xlab)){xlab <- x$x.trait}
   if(is.null(ylab)){ylab <- x$y.trait}
@@ -345,9 +345,10 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
       ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
       ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
     }
-
+    if(add==FALSE){
     plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab)
-
+    }
+    
     #if bootstrapped lines are to be drawn:
     if(x$boot){
       for(i in 1:nrow(bpar)){
@@ -401,9 +402,9 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
       ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
     }
 
-
+    if(add==FALSE){
     plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab)
-
+    }
     print(nrow(bpar))
     ### Draw bootstrapped lines
     if(x$boot){
