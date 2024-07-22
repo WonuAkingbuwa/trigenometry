@@ -14,7 +14,7 @@ https://github.com/settings/tokens
 And then install from github:
 
 ```r
-devtools::install_github("MichelNivard/trigenometry",
+devtools::install_github("WonuAkingbuwa/trigenometry",
                          ref = "main",
                          auth_token = # YOUR TOKEN HERE, DO NOT EVER SHARE TOKEN                      
                         )
@@ -24,7 +24,7 @@ devtools::install_github("MichelNivard/trigenometry",
 
 ### Usage
 
-Currently we split out makign a curve form ploting it:
+Currently we split out making a curve from plotting it:
 
 ```r
 c2c <- cor2curve(...)
@@ -33,6 +33,6 @@ plot(c2c)
 
 ```
 
-This currently allows the user to set some axis labels, It will ease future updates for manually setting colors and perhaps ease combinin plots?
+This currently allows the user to set some axis labels, It will ease future updates for manually setting colors and perhaps ease combining plots?
 
 
