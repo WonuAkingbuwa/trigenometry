@@ -327,8 +327,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
 
     par <-x$par
     bpar <- x$bpar
-    min <- min(c(x$b1,x$b2)) - 1
-    max <- max(c(x$b1,x$b2)) + 1
+    min <- min(c(x$b1,x$b2)) 
+    max <- max(c(x$b1,x$b2)) 
 
     if(is.null(xlim)){ xlim <- c(min,max)}
 
@@ -342,8 +342,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     if(is.null(ylim)){
       ylim <- c(min(ys) - int,max(ys) - int)
 
-      ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
-      ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
+      ylim[1] <- ylim[1] - .4*(abs(ylim[1] - ylim[2]))
+      ylim[2] <- ylim[2] + .4*(abs(ylim[1] - ylim[2]))
     }
     if(add==FALSE){
     plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab, ... )
@@ -381,8 +381,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     q1 <- x$cuts[1]
     q2 <- x$cuts[2]
 
-    min <- min(c(x$b1,x$b2)) - 1
-    max <- max(c(x$b1,x$b2)) + 1
+    min <- min(c(x$b1,x$b2)) 
+    max <- max(c(x$b1,x$b2)) 
 
     if(is.null(xlim)){ xlim <- c(min,max)}
 
@@ -397,8 +397,8 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     if(is.null(ylim)){
       ylim <- c(min(ys) - int,max(ys) - int)
 
-      ylim[1] <- ylim[1] - .2*(abs(ylim[1] - ylim[2]))
-      ylim[2] <- ylim[2] + .2*(abs(ylim[1] - ylim[2]))
+      ylim[1] <- ylim[1] - .4*(abs(ylim[1] - ylim[2]))
+      ylim[2] <- ylim[2] + .4*(abs(ylim[1] - ylim[2]))
     }
 
     if(add==FALSE){
