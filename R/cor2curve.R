@@ -316,7 +316,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 #'
 #' @return A plot of the curve.
 #'
-plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,ylab=NULL,boot=NULL,add=FALSE, ... ){
+plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,ylab=NULL,col.curve="black", col.boot="grey",boot=NULL,add=FALSE, ... ){
 
   if(is.null(xlab)){xlab <- x$x.trait}
   if(is.null(ylab)){ylab <- x$y.trait}
@@ -357,7 +357,7 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
         # build an intercept
         int <- mean(ys)
 
-        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col="grey",lty="dashed")
+        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col=col.boot,lty="dashed")
       }
     }
 
@@ -367,7 +367,7 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     # build an intercept
     int <- mean(ys)
 
-    curve(par[1]*x^5 + par[2]*x^4 + par[3]*x^3 + par[4]*x^2 + par[5]*x  - int,from = xlim[1], to = xlim[2],add=T)
+    curve(par[1]*x^5 + par[2]*x^4 + par[3]*x^3 + par[4]*x^2 + par[5]*x  - int,from = xlim[1], to = xlim[2],add=T, col = col.curve)
 
 
   }
@@ -414,22 +414,22 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
         seint <- mean(seys)
 
 
-        curve(bpar[i,1]*x^3 + bpar[i,2] * x^2 + bpar[i,3] * x + bpar[i,4]  - seint,from =min,to=q1,add=T,col="grey",lty="dashed")
+        curve(bpar[i,1]*x^3 + bpar[i,2] * x^2 + bpar[i,3] * x + bpar[i,4]  - seint,from =min,to=q1,add=T,col=col.boot,lty="dashed")
 
-        curve(bpar[i,5]*x^3 + bpar[i,6] * x^2 + bpar[i,7] * x + bpar[i,8] - seint,from = q1,to=q2,add=T,col="grey",lty="dashed")
+        curve(bpar[i,5]*x^3 + bpar[i,6] * x^2 + bpar[i,7] * x + bpar[i,8] - seint,from = q1,to=q2,add=T,col=col.boot,lty="dashed")
 
-        curve(bpar[i,9]*x^3 + bpar[i,10] * x^2 + bpar[i,11] * x  + bpar[i,12] - seint,from = q2,to=max,add=T,col="grey",lty="dashed")
+        curve(bpar[i,9]*x^3 + bpar[i,10] * x^2 + bpar[i,11] * x  + bpar[i,12] - seint,from = q2,to=max,add=T,col=col.boot,lty="dashed")
 
       }
     }
 
     # Plot the curve...
 
-    curve(par[1]*x^3 + par[2] * x^2 + par[3] * x + par[4]  - int ,from =min,to=q1,add=T)
+    curve(par[1]*x^3 + par[2] * x^2 + par[3] * x + par[4]  - int ,from =min,to=q1,add=T,col=col.curve)
 
-    curve(par[5]*x^3 + par[6] * x^2 + par[7] * x + par[8] - int ,from = q1,to=q2,add=T)
+    curve(par[5]*x^3 + par[6] * x^2 + par[7] * x + par[8] - int ,from = q1,to=q2,add=T,col=col.curve)
 
-    curve(par[9]*x^3 + par[10] * x^2 + par[11] * x + par[12] - int ,from = q2,to=max,add=T)
+    curve(par[9]*x^3 + par[10] * x^2 + par[11] * x + par[12] - int ,from = q2,to=max,add=T,col=col.curve)
 
   }
 
