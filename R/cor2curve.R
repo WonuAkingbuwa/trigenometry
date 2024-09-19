@@ -357,7 +357,7 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
         # build an intercept
         int <- mean(ys)
 
-        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col=col.boot,lty="dashed")
+        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col=col.boot,lty="dashed",...)
       }
     }
 
@@ -425,11 +425,11 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
 
     # Plot the curve...
 
-    curve(par[1]*x^3 + par[2] * x^2 + par[3] * x + par[4]  - int ,from =min,to=q1,add=T,col=col.curve)
+    curve(par[1]*x^3 + par[2] * x^2 + par[3] * x + par[4]  - int ,from =min,to=q1,add=T,col=col.curve,...)
 
-    curve(par[5]*x^3 + par[6] * x^2 + par[7] * x + par[8] - int ,from = q1,to=q2,add=T,col=col.curve)
+    curve(par[5]*x^3 + par[6] * x^2 + par[7] * x + par[8] - int ,from = q1,to=q2,add=T,col=col.curve,...)
 
-    curve(par[9]*x^3 + par[10] * x^2 + par[11] * x + par[12] - int ,from = q2,to=max,add=T,col=col.curve)
+    curve(par[9]*x^3 + par[10] * x^2 + par[11] * x + par[12] - int ,from = q2,to=max,add=T,col=col.curve,...)
 
   }
 
@@ -489,10 +489,6 @@ print.cor2curve = function(x){
   }
 
 }
-
-
-
-
 
 
 
