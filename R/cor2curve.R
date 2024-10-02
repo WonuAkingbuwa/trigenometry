@@ -36,7 +36,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
   dat2 <- na.omit(dat)
 
   # se filter
-  dat3 <-  dat2[dat2$se < se.filter,]  
+  dat3 <-  dat2[dat2[,4] < se.filter,]  
 
   rg <- dat3[,1]
   b1 <- dat3[,2]
