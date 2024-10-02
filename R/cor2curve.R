@@ -437,7 +437,7 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
     if(add==FALSE){
     plot(NULL,xlim=xlim,ylim=ylim,main=main,sub=sub,ylab=ylab,xlab=xlab, ... )
     }
-    print(nrow(bpar))
+  
     ### Draw bootstrapped lines
     if(x$boot){
       for(i in 1:nrow(bpar)){
