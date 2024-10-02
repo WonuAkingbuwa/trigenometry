@@ -14,7 +14,7 @@
 #'
 #' @return a list with any data pruning undertaken, parameters, optimizer status and the method used for interpolation
 #' @return (optionally) a curve reflection the estimated non-linear genetic relationship.
-cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FALSE,x.trait="",y.trait=""){
+cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FALSE,se.filter=.30,x.trait="",y.trait=""){
   # Arguments:
   # rg: genetic correlation genetic correlation between this GWAS of a pair of bins of x, and the outcome y.
   # b1:value assigned to bin b1 used in the GWAS of "x" usually a count, or median/mean phenotype for participants in the bin, used to compute dx
@@ -35,10 +35,13 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
   dat <- cbind(rg,b1,b2,se)
   dat2 <- na.omit(dat)
 
-  rg <- dat2[,1]
-  b1 <- dat2[,2]
-  b2 <- dat2[,3]
-  se <- dat2[,4]
+  # se filter
+  dat3 <-  dat2[dat2$se < se.filter,]  
+
+  rg <- dat3[,1]
+  b1 <- dat3[,2]
+  b2 <- dat3[,3]
+  se <- dat3[,4]
 
   mess <- "No missing data"
   if( nrow(dat2) < nrow(dat)){
@@ -46,7 +49,12 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
     mess <- paste0("Had to omit ",nrow(dat) - nrow(dat2)," rows with missing values in rg, b1, b2, or se" )
 
   }
+ mess <- "no se's pout of bounds"
+  if( nrow(dat2) < nrow(dat)){
+    print(paste0("Had to omit ",nrow(dat2) - nrow(dat3)," rows with se's out of (user specified) bounds" ))
+    mess <- paste0("Had to omit ",nrow(dat2) - nrow(dat3)," rows with se's out of (user specified) bound" )
 
+  }
 
   # warn if rg our of bounds
   mess2 <- "All genetic correlations between -1 and 1"
