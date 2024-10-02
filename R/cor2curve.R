@@ -104,8 +104,9 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 
         rgi <- rnorm(length(rg),rg,se)
 
-        rgi[abs(rgi) > .9999] <- .9999
-
+        rgi[rgi > .9999] <-  .9999
+        rgi[rgi < -.9999] <-  -.9999
+        
         # the correlation, divided by distance, as an angle
         angle <- 90 - acos(rgi) * 180/pi
 
@@ -240,7 +241,8 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 
         rgi <- rnorm(length(rg),rg,se)
 
-        rgi[abs(rgi) > .9999] <- .9999
+        rgi[rgi > .9999] <-  .9999
+        rgi[rgi < -.9999] <-  -.9999
 
         # the correlation, divided by distance, as an angle
         angle <- 90 - acos(rgi) * 180/pi
