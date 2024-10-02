@@ -256,7 +256,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 
 
     # this is where we really minimize...
-    fit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS",maxit=500)
+    fit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS",control=list(maxit=500))
 
 
 
@@ -282,7 +282,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 
 
         # this is where we really minimize...
-        sefit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS",maxit=500)
+        sefit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS",control=list(maxit=500))
         sev[i,] <- sefit$par
         value[i] <- sefit$value
         
