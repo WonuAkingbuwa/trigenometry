@@ -164,7 +164,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
           sefit <- optim(par = c(0,0,0,0,0),fn = solve_fn,method = "BFGS")
         }
         sev[i,] <- sefit$par
-        value[i] <- sefit$par
+        value[i] <- sefit$value
         
       }
       lr <-  IQR.outliers(value)
