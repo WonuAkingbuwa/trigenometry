@@ -77,6 +77,26 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
   dy <- tan(angle/ (180/pi))
 
 
+  ### Filter for the bootstrap outliers:
+  IQR.outliers <- function(x) {
+  if(any(is.na(x)))
+    stop("x is missing values")
+  if(!is.numeric(x))
+    stop("x is not numeric")
+  Q3<-quantile(x,0.75)
+  Q1<-quantile(x,0.25)
+  IQR<-(Q3-Q1)
+  left<- (Q1-(1.5*IQR))
+  right<- (Q3+(1.5*IQR))
+  out <- x[x >left  & x < right]
+  if(length(out) < length(x)){
+    print('Had to omit suspect bootstrap itterations where the optimizer value was far outside the norm!')
+  }
+   c(left,right)
+  }
+
+
+
 
   if(method == "polynomial"){
 
@@ -107,7 +127,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
     if(boot==T){
 
       sev <- matrix(NA,200,5)
-
+      value <- matrix(NA,200,1)
       for(i in 1:200){
 
         rgi <- rnorm(length(rg),rg,se)
@@ -144,9 +164,11 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
           sefit <- optim(par = c(0,0,0,0,0),fn = solve_fn,method = "BFGS")
         }
         sev[i,] <- sefit$par
-
+        value[i] <- sefit$par
+        
       }
-
+      lr <-  IQR.outliers(value)
+      sev <-  sev[value > lr[1] & value < lr[2],]
       sep <- apply(sev,2,sd)
 
     }
@@ -240,11 +262,11 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
 
 
     sep <- rep(NA,12)
-
+    
     if(boot==T){
 
       sev <- matrix(NA,200,12)
-
+      value <- matrix(NA,200,1)
       for(i in 1:200){
 
         rgi <- rnorm(length(rg),rg,se)
@@ -263,12 +285,14 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
         sefit <- optim(par = rep(0,12),fn = spline_fn,method = "BFGS")
         print(sefit)
         sev[i,] <- sefit$par
-
+        value[i] <- sefit$value
+        
 
       }
 
 
-
+      lr <-  IQR.outliers(value)
+      sev <-  sev[value > lr[1] & value < lr[2],]
       sep <- apply(sev,2,sd)
 
     }
