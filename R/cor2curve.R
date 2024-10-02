@@ -86,8 +86,8 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
   Q3<-quantile(x,0.75)
   Q1<-quantile(x,0.25)
   IQR<-(Q3-Q1)
-  left<- (Q1-(1.5*IQR))
-  right<- (Q3+(1.5*IQR))
+  left<- (Q1-(3*IQR))
+  right<- (Q3+(3*IQR))
   out <- x[x >left  & x < right]
   if(length(out) < length(x)){
     print('Had to omit suspect bootstrap itterations where the optimizer value was far outside the norm!')
