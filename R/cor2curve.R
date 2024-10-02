@@ -251,7 +251,7 @@ cor2curve <- function(rg,b1,b2,se,method = "polynomial",q1=NULL,q2=NULL,boot=FAL
       intr[ b1  > q2 ,2] <- (a_3*b1[b1  > q2 ]^3 + b_3*b1[b1  > q2]^2 + c_3*b1[b1  > q2]^1 + d_3)
 
       ak <- mean((dy - (intr[,2] - intr[,1]))^2 * 1/((se^2)))
-      ak + 100000*(constr1^2 + constr1d^2 + constr2^2 + constr2d^2)
+      ak + 10*(constr1^2 + constr1d^2 + constr2^2 + constr2d^2)
     }
 
 
