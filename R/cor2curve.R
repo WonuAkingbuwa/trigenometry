@@ -390,7 +390,7 @@ plot.cor2curve <- function(x,xlim=NULL,ylim=NULL,main=NULL,sub=NULL,xlab=NULL,yl
         # build an intercept
         int <- mean(ys)
 
-        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,lwd=.5,add=T,col=col.boot,lty="dashed",...)
+        curve(bpar[i,1]*x^5 + bpar[i,2]*x^4 + bpar[i,3]*x^3 + bpar[i,4]*x^2 + bpar[i,5]*x - int,from = min, to = max,add=T,col=col.boot,lty="dashed",...)
       }
     }
 
